@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Houshang Subscription Opener</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: #1a1a2e;
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .container {
+            background-color: #16213e;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            max-width: 400px;
+            width: 100%;
+        }
+
+        h1 {
+            color: #e94560;
+            margin-bottom: 2rem;
+            font-size: 1.5rem;
+        }
+
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+            text-decoration: none;
+            color: white;
+            font-weight: bold;
+            font-size: 1.1rem;
+            transition: opacity 0.3s;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn:hover {
+            opacity: 0.9;
+        }
+
+        .android {
+            background-color: #3ddc84;
+            color: #000;
+        }
+
+        .ios {
+            background-color: #007aff;
+        }
+
+        .copy {
+            background-color: #6c757d;
+            margin-top: 20px;
+            font-size: 0.9rem;
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>افزودن اشتراک هوشنگ</h1>
+        <p style="margin-bottom: 20px; color: #a0a0a0;">سیستم عامل خود را انتخاب کنید:</p>
+
+        <a id="androidBtn" href="#" class="btn android">
+            اندروید (v2rayNG) 📱
+        </a>
+
+        <a id="iosBtn" href="#" class="btn ios">
+            آیفون (v2Box) 🍏
+        </a>
+
+        <button id="copyBtn" class="btn copy">
+            کپی لینک اشتراک 📋
+        </button>
+        <p id="msg" style="margin-top: 10px; color: #4cd137; display: none;">کپی شد!</p>
+    </div>
+
+    <script>
+        // Get URL parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const subUrl = urlParams.get('url');
+        const os = urlParams.get('os'); // 'android' or 'ios'
+
+        if (subUrl) {
+            const androidBtn = document.getElementById('androidBtn');
+            const iosBtn = document.getElementById('iosBtn');
+            const copyBtn = document.getElementById('copyBtn');
+
+            // Set Hrefs
+            // Android: v2rayng://install-sub?url=...
+            androidBtn.href = `v2rayng://install-sub?url=${encodeURIComponent(subUrl)}`;
+            // iOS: v2box://install-sub?url=...
+            iosBtn.href = `v2box://install-sub?url=${encodeURIComponent(subUrl)}`;
+
+            // Copy Button Logic
+            copyBtn.onclick = function () {
+                navigator.clipboard.writeText(subUrl).then(() => {
+                    const msg = document.getElementById('msg');
+                    msg.style.display = 'block';
+                    setTimeout(() => msg.style.display = 'none', 2000);
+                });
+            };
+
+            // Handle OS specific view/action
+            if (os === 'android') {
+                iosBtn.classList.add('hidden');
+                document.querySelector('.container p').textContent = 'در حال انتقال به v2rayNG...';
+                setTimeout(() => { androidBtn.click(); }, 500);
+            } else if (os === 'ios') {
+                androidBtn.classList.add('hidden');
+                document.querySelector('.container p').textContent = 'در حال انتقال به v2Box...';
+                setTimeout(() => { iosBtn.click(); }, 500);
+            }
+
+        } else {
+            document.querySelector('.container').innerHTML = '<h2>❌ لینک اشتراک یافت نشد!</h2><p>لطفاً از طریق دکمه‌های ربات اقدام کنید.</p>';
+        }
+    </script>
+</body>
+
+</html>
