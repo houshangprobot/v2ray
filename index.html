@@ -6,71 +6,153 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Houshang Subscription Opener</title>
     <style>
+        :root {
+            --bg: #1a1a2e;
+            --card: #16213e;
+            --accent: #e94560;
+            --muted: #a0a0a0;
+        }
+
+        * { box-sizing: border-box; }
+
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-            background-color: #1a1a2e;
+            background-color: var(--bg);
             color: #fff;
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
-            height: 100vh;
+            min-height: 100vh;
             margin: 0;
             padding: 20px;
             text-align: center;
         }
 
         .container {
-            background-color: #16213e;
-            padding: 2rem;
+            background-color: var(--card);
+            padding: 1.6rem;
             border-radius: 15px;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-            max-width: 400px;
+            max-width: 460px;
             width: 100%;
         }
 
         h1 {
-            color: #e94560;
-            margin-bottom: 2rem;
-            font-size: 1.5rem;
+            color: var(--accent);
+            margin: 0 0 .6rem;
+            font-size: 1.4rem;
         }
+
+        .hint {
+            color: var(--muted);
+            font-size: .9rem;
+            margin: 0 0 1rem;
+        }
+
+        .tabs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            justify-content: center;
+            margin-bottom: 14px;
+        }
+
+        .tab {
+            background: #0f3460;
+            border: 1px solid #1f4b83;
+            color: #cfe3ff;
+            border-radius: 999px;
+            padding: 6px 12px;
+            font-size: .82rem;
+            cursor: pointer;
+        }
+
+        .tab.active {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: #fff;
+        }
+
+        .clients {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            max-height: 52vh;
+            overflow-y: auto;
+            padding-left: 2px;
+        }
+
+        .client {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            background: #0f3460;
+            border: 1px solid #1f4b83;
+            border-radius: 10px;
+            padding: 10px 12px;
+            text-decoration: none;
+            color: #fff;
+            transition: opacity .15s ease;
+        }
+
+        .client:hover { opacity: .85; }
+
+        .client .info {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            text-align: right;
+        }
+
+        .client .name { font-weight: 700; font-size: .98rem; }
+        .client .desc { color: var(--muted); font-size: .76rem; }
+
+        .client .cta {
+            background: var(--accent);
+            color: #fff;
+            border-radius: 8px;
+            padding: 6px 10px;
+            font-size: .8rem;
+            white-space: nowrap;
+        }
+
+        .client.nolink .cta { background: #6c757d; }
 
         .btn {
             display: block;
             width: 100%;
-            padding: 15px;
-            margin: 10px 0;
+            padding: 13px;
+            margin-top: 12px;
             border-radius: 8px;
             text-decoration: none;
             color: white;
             font-weight: bold;
-            font-size: 1.1rem;
-            transition: opacity 0.3s;
+            font-size: 1rem;
             border: none;
             cursor: pointer;
-        }
-
-        .btn:hover {
-            opacity: 0.9;
-        }
-
-        .android {
-            background-color: #3ddc84;
-            color: #000;
-        }
-
-        .ios {
-            background-color: #007aff;
-        }
-
-        .copy {
             background-color: #6c757d;
-            margin-top: 20px;
-            font-size: 0.9rem;
         }
 
-        .hidden {
+        .btn:hover { opacity: .9; }
+
+        #msg {
+            margin-top: 10px;
+            color: #4cd137;
             display: none;
+            font-size: .9rem;
+        }
+
+        .hidden { display: none !important; }
+
+        .error h2 { color: var(--accent); }
+        .error p { color: var(--muted); font-size: .9rem; }
+
+        .footnote {
+            margin-top: 14px;
+            color: var(--muted);
+            font-size: .75rem;
+            line-height: 1.7;
         }
     </style>
 </head>
@@ -78,62 +160,227 @@
 <body>
     <div class="container">
         <h1>افزودن اشتراک هوشنگ</h1>
-        <p style="margin-bottom: 20px; color: #a0a0a0;">سیستم عامل خود را انتخاب کنید:</p>
+        <p class="hint" id="hint">کلاینت خود را انتخاب کنید:</p>
 
-        <a id="androidBtn" href="#" class="btn android">
-            اندروید (v2rayNG) 📱
-        </a>
+        <div class="tabs" id="tabs"></div>
+        <div class="clients" id="clients"></div>
 
-        <a id="iosBtn" href="#" class="btn ios">
-            آیفون (v2Box) 🍏
-        </a>
+        <button id="copyBtn" class="btn">کپی لینک اشتراک 📋</button>
+        <p id="msg">✅ کپی شد!</p>
 
-        <button id="copyBtn" class="btn copy">
-            کپی لینک اشتراک 📋
-        </button>
-        <p id="msg" style="margin-top: 10px; color: #4cd137; display: none;">کپی شد!</p>
+        <p class="footnote" id="footnote">
+            با کلیک روی هر کلاینت، لینک اشتراک به‌صورت خودکار در آن باز می‌شود.
+            اگر اپ باز نشد، لینک را کپی کنید و داخل کلاینت Import کنید.
+        </p>
+
+        <div id="error" class="error hidden">
+            <h2>❌ لینک اشتراک یافت نشد!</h2>
+            <p>لطفاً از طریق دکمه‌های ربات اقدام کنید.</p>
+        </div>
     </div>
 
     <script>
-        // Get URL parameters
         const urlParams = new URLSearchParams(window.location.search);
         const subUrl = urlParams.get('url');
-        const os = urlParams.get('os'); // 'android' or 'ios'
+        const osParam = (urlParams.get('os') || '').toLowerCase();
 
-        if (subUrl) {
-            const androidBtn = document.getElementById('androidBtn');
-            const iosBtn = document.getElementById('iosBtn');
-            const copyBtn = document.getElementById('copyBtn');
+        // ---- کلاینت‌ها: id, نام, پلتفرم‌ها، لینک عمیق (یا null = فقط کپی) ----
+        const enc = (u) => encodeURIComponent(u);
 
-            // Set Hrefs
-            // Android: v2rayng://install-sub?url=...
-            androidBtn.href = `v2rayng://install-sub?url=${encodeURIComponent(subUrl)}`;
-            // iOS: v2box://install-sub?url=...
-            iosBtn.href = `v2box://install-sub?url=${encodeURIComponent(subUrl)}`;
+        function b64url(str) {
+            const bytes = new TextEncoder().encode(str);
+            let bin = '';
+            bytes.forEach((b) => { bin += String.fromCharCode(b); });
+            return btoa(bin).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+        }
 
-            // Copy Button Logic
-            copyBtn.onclick = function () {
-                navigator.clipboard.writeText(subUrl).then(() => {
-                    const msg = document.getElementById('msg');
-                    msg.style.display = 'block';
-                    setTimeout(() => msg.style.display = 'none', 2000);
+        const CLIENTS = [
+            { id: 'v2rayng',    name: 'v2rayNG',            plats: ['android'],                    build: (u) => `v2rayng://install-sub?url=${enc(u)}` },
+            { id: 'hiddify',    name: 'Hiddify',            plats: ['android', 'ios', 'windows', 'macos', 'linux'], build: (u) => `hiddify://install-sub?url=${enc(u)}` },
+            { id: 'singbox',    name: 'sing-box',           plats: ['android', 'ios', 'windows', 'macos', 'linux'], build: (u) => `sing-box://import-remote-profile?url=${enc(u)}&name=Houshang` },
+            { id: 'v2box',      name: 'v2Box',              plats: ['ios'],                        build: (u) => `v2box://install-sub?url=${enc(u)}` },
+            { id: 'streisand',  name: 'Streisand',          plats: ['ios', 'macos'],               build: (u) => `streisand://import/${enc(u)}` },
+            { id: 'shadowrocket', name: 'Shadowrocket',     plats: ['ios'],                        build: (u) => `sub://${b64url(u)}` },
+            { id: 'stash',      name: 'Stash',              plats: ['ios'],                        build: (u) => `stash://install-config?url=${enc(u)}` },
+            { id: 'karing',     name: 'Karing',             plats: ['ios', 'windows'],             build: (u) => `karing://install-config?url=${enc(u)}` },
+            { id: 'clash',      name: 'Clash Verge / ClashX', plats: ['windows', 'macos'],         build: (u) => `clash://install-config?url=${enc(u)}` },
+            { id: 'v2rayn',     name: 'v2rayN',             plats: ['windows'],                    build: null },
+            { id: 'nekoray',    name: 'NekoBox / NekoRay',  plats: ['android', 'windows', 'linux'], build: null },
+            { id: 'fairvpn',    name: 'FairVPN / سایر',     plats: ['android', 'ios'],             build: null }
+        ];
+
+        const PLATFORMS = [
+            { id: 'android', label: '🤖 اندروید' },
+            { id: 'ios', label: '🍏 آیفون' },
+            { id: 'windows', label: '🪟 ویندوز' },
+            { id: 'macos', label: '🍎 مک' },
+            { id: 'linux', label: '🐧 لینوکس' },
+            { id: 'all', label: 'همه' }
+        ];
+
+        const ALIAS = { android: 'v2rayng', ios: 'v2box', win: 'windows' };
+
+        function detectPlatform() {
+            const ua = (navigator.userAgent || '').toLowerCase();
+            if (/android/.test(ua)) return 'android';
+            if (/iphone|ipad|ipod/.test(ua)) return 'ios';
+            if (/mac os|macintosh/.test(ua)) return 'macos';
+            if (/windows/.test(ua)) return 'windows';
+            if (/linux|x11/.test(ua)) return 'linux';
+            return 'all';
+        }
+
+        function clientLink(client) {
+            if (!subUrl) return null;
+            try { return client.build ? client.build(subUrl) : null; }
+            catch (e) { return null; }
+        }
+
+        async function copyText(text) {
+            try {
+                await navigator.clipboard.writeText(text);
+                return true;
+            } catch (e) {
+                const ta = document.createElement('textarea');
+                ta.value = text;
+                ta.style.position = 'fixed';
+                ta.style.opacity = '0';
+                document.body.appendChild(ta);
+                ta.select();
+                let ok = false;
+                try { ok = document.execCommand('copy'); } catch (e2) { ok = false; }
+                document.body.removeChild(ta);
+                return ok;
+            }
+        }
+
+        let activePlat = detectPlatform();
+        let focusClient = null;
+
+        if (osParam) {
+            const target = ALIAS[osParam] || osParam;
+            if (target === 'copy') {
+                focusClient = 'copy';
+            } else if (PLATFORMS.some((p) => p.id === target)) {
+                activePlat = target;
+            } else if (CLIENTS.some((c) => c.id === target)) {
+                focusClient = target;
+                const c = CLIENTS.find((x) => x.id === target);
+                activePlat = (c.plats && c.plats[0]) || detectPlatform();
+            }
+        }
+
+        function renderTabs() {
+            const el = document.getElementById('tabs');
+            el.innerHTML = '';
+            PLATFORMS.forEach((p) => {
+                const b = document.createElement('div');
+                b.className = 'tab' + (p.id === activePlat ? ' active' : '');
+                b.textContent = p.label;
+                b.onclick = () => { activePlat = p.id; focusClient = null; render(); };
+                el.appendChild(b);
+            });
+        }
+
+        function renderClients() {
+            const el = document.getElementById('clients');
+            el.innerHTML = '';
+
+            const list = CLIENTS.filter((c) => {
+                if (focusClient) return c.id === focusClient;
+                if (activePlat === 'all') return true;
+                return c.plats.indexOf(activePlat) !== -1;
+            });
+
+            list.forEach((c) => {
+                const link = clientLink(c);
+                const a = document.createElement('a');
+                a.className = 'client' + (link ? '' : ' nolink');
+                a.href = link || '#';
+                a.dataset.id = c.id;
+
+                const info = document.createElement('div');
+                info.className = 'info';
+                const name = document.createElement('span');
+                name.className = 'name';
+                name.textContent = c.name;
+                const desc = document.createElement('span');
+                desc.className = 'desc';
+                desc.textContent = link ? 'کلیک برای افزودن خودکار' : 'لینک را کپی و Import کنید';
+                info.appendChild(name);
+                info.appendChild(desc);
+
+                const cta = document.createElement('span');
+                cta.className = 'cta';
+                cta.textContent = link ? 'باز کردن ↗' : 'کپی لینک 📋';
+
+                a.appendChild(info);
+                a.appendChild(cta);
+
+                a.addEventListener('click', async (ev) => {
+                    if (link) {
+                        ev.preventDefault();
+                        window.location.href = link;
+                        toast(`در حال باز کردن ${c.name} ... اگر باز نشد، لینک را کپی کن.`);
+                    } else {
+                        ev.preventDefault();
+                        const ok = await copyText(subUrl);
+                        toast(ok ? 'لینک اشتراک کپی شد ✔' : 'کپی ممکن نشد؛ از دکمهٔ پایین استفاده کنید.');
+                    }
                 });
-            };
 
-            // Handle OS specific view/action
-            if (os === 'android') {
-                iosBtn.classList.add('hidden');
-                document.querySelector('.container p').textContent = 'در حال انتقال به v2rayNG...';
-                setTimeout(() => { androidBtn.click(); }, 500);
-            } else if (os === 'ios') {
-                androidBtn.classList.add('hidden');
-                document.querySelector('.container p').textContent = 'در حال انتقال به v2Box...';
-                setTimeout(() => { iosBtn.click(); }, 500);
+                el.appendChild(a);
+            });
+
+            if (!list.length) {
+                el.innerHTML = '<p class="hint">کلاینتی برای این پلتفرم پیدا نشد؛ تب «همه» را بزنید.</p>';
+            }
+        }
+
+        function toast(msg) {
+            const m = document.getElementById('msg');
+            m.textContent = msg;
+            m.style.display = 'block';
+            clearTimeout(toast._t);
+            toast._t = setTimeout(() => { m.style.display = 'none'; }, 3500);
+        }
+
+        function render() {
+            renderTabs();
+            renderClients();
+        }
+
+        function init() {
+            if (!subUrl) {
+                document.querySelector('.container').innerHTML =
+                    '<div class="error"><h2>❌ لینک اشتراک یافت نشد!</h2>' +
+                    '<p>لطفاً از طریق دکمه‌های ربات اقدام کنید.</p></div>';
+                return;
             }
 
-        } else {
-            document.querySelector('.container').innerHTML = '<h2>❌ لینک اشتراک یافت نشد!</h2><p>لطفاً از طریق دکمه‌های ربات اقدام کنید.</p>';
+            document.getElementById('copyBtn').addEventListener('click', async () => {
+                const ok = await copyText(subUrl);
+                const m = document.getElementById('msg');
+                m.textContent = ok ? '✅ کپی شد!' : '❌ کپی ممکن نشد';
+                m.style.display = 'block';
+                setTimeout(() => { m.style.display = 'none'; }, 2000);
+            });
+
+            render();
+
+            // باز شدن خودکار کلاینت انتخاب‌شده (os=<client>)
+            if (focusClient && focusClient !== 'copy') {
+                const c = CLIENTS.find((x) => x.id === focusClient);
+                const link = c && clientLink(c);
+                if (link) {
+                    const hint = document.getElementById('hint');
+                    if (hint) hint.textContent = `در حال انتقال به ${c.name} ...`;
+                    setTimeout(() => { window.location.href = link; }, 700);
+                }
+            }
         }
+
+        init();
     </script>
 </body>
 
