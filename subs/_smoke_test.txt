@@ -1,0 +1,1 @@
+vless://smoke@test:443#smoke
