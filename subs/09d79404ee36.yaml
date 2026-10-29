@@ -1,0 +1,13 @@
+
+proxies:
+  - name: a
+    type: ss
+    server: 1.1.1.1
+    port: 443
+    cipher: aes-128-gcm
+    password: x
+  - name: b
+    type: trojan
+    server: 2.2.2.2
+    port: 443
+    password: y
